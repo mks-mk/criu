@@ -292,6 +292,7 @@ static int __init_cow(struct test_cases *tcs, int flags)
 {
 	int i;
 	void *addr;
+	char *ptr;
 
 	addr = mmap(NULL, PAGE_SIZE * (TEST_CASES + 2), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (addr == MAP_FAILED) {
@@ -305,9 +306,10 @@ static int __init_cow(struct test_cases *tcs, int flags)
 	 * in child they cannot be, so COW will not be restored. FIXME
 	 */
 	mmap(addr, PAGE_SIZE, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
-	addr += PAGE_SIZE;
-	tcs->addr = addr;
-	mmap(addr + PAGE_SIZE * TEST_CASES, PAGE_SIZE, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED | flags, -1,
+	ptr = (char *)addr;
+	ptr += PAGE_SIZE;
+	tcs->addr = ptr;
+	mmap((char *)addr + PAGE_SIZE * (TEST_CASES)+1, PAGE_SIZE, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED | flags, -1,
 	     0);
 
 	test_msg("addr[%s]=%p\n", tcs->tname, tcs->addr);
